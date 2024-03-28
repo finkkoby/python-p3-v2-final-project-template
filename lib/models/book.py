@@ -1,4 +1,5 @@
-from author import Author
+from .author import Author
+from .__init__ import CONN, CURSOR
 
 class Book:
 
