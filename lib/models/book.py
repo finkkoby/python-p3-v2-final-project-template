@@ -112,7 +112,7 @@ class Book:
     @classmethod
     def instance_from_db(cls, row):
         # returns object that is an instance of the CLS at the ROW in the database
-        book = cls.all[row[0]]
+        book = cls.all.get(row[0])
         if book:
             book.title = row[1]
             book.pages = row[2]

@@ -98,8 +98,8 @@ class Author:
     @classmethod
     def instance_from_db(cls, row):
         # returns object that is an instance of the CLS at the ROW in the database
-        author = cls.all[row[0]]
-        if author:
+        author = cls.all.get(row[0])
+        if author is not None:
             author.first_name = row[1]
             author.last_name = row[2]
             return author
@@ -114,7 +114,7 @@ class Author:
             FROM authors
         """
         rows = CURSOR.execute(sql).fetchall()
-        return [cls.instance_from_db(row) for row in rows]
+        return [cls.instance_from_db(row) for row in rows] if rows else Exception("No authors found")
 
     @classmethod
     def find_by_id(cls, author_id):
