@@ -13,44 +13,48 @@ from helpers import (
     create_book,
     update_book,
     delete_book,
-    list_author_books
+    list_author_books,
+    show_more
 )
-
-
 def main():
+    print(f"\nWelcome to my bookshelf!\n")
     while True:
-        menu()
-        choice = input("> ")
-        if choice == "0":
-            exit_program()
-        elif choice == "1":
-            list_authors()
-        elif choice == "2":
-            find_author_by_name()
-        elif choice == "3":
-            find_author_by_id()
-        elif choice == "4":
-            create_author()
-        elif choice == "5":
-            update_author()
-        elif choice == "6":
-            delete_author()
-        elif choice == "7":
-            list_books()
-        elif choice == "8":
-            find_book_by_name()
-        elif choice == "9":
-            find_book_by_id()
-        elif choice == "10":
-            create_book()
-        elif choice == "11":
-            update_book()
-        elif choice == "12":
-            delete_book()
-        elif choice == "13":
-            list_author_books()
-        else:
-            print("Invalid choice")
+        settings()
+        show_more()
+
+def settings():
+    menu()
+    choice = input("> ")
+    if choice == "0":
+        exit_program()
+    elif choice == "1":
+        list_authors()
+    elif choice == "2":
+        find_author_by_name()
+    elif choice == "3":
+        find_author_by_id()
+    elif choice == "4":
+        create_author()
+    elif choice == "5":
+        update_author()
+    elif choice == "6":
+        delete_author()
+    elif choice == "7":
+        list_books()
+    elif choice == "8":
+        find_book_by_name()
+    elif choice == "9":
+        find_book_by_id()
+    elif choice == "10":
+        create_book()
+    elif choice == "11":
+        update_book()
+    elif choice == "12":
+        delete_book()
+    elif choice == "13":
+        list_author_books()
+    else:
+        print("Invalid choice")
 
 
 def menu():
