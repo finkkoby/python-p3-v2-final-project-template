@@ -58,6 +58,28 @@ class Book:
         self.id = CURSOR.lastrowid
         type(self).all[self.id] = self
 
+    def update(self):
+        # update db with object stored in memory
+        sql = """
+            UPDATE books
+            SET title = ?, pages = ?, author_id = ?
+            WHERE id = ?
+        """
+        CURSOR.execute(sql, (self.title, self.pages, self.author_id, self.id))
+        CONN.commit()
+        print(f"Database updated: {self}")
+
+    def delete(self):
+        # remove self from db but keep stored in memory
+        del Book.all[self.id]
+        sql = """
+            DELETE FROM books
+            WHERE id = ?
+        """
+        CURSOR.execute(sql, (self.id,))
+        CONN.commit()
+        print(f"Row deleted, object is still stored in memory")
+
 # CLASS METHODS !!!!!!
     @classmethod
     def create_table(cls):

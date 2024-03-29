@@ -44,9 +44,29 @@ class Author:
         CONN.commit()
         self.id = CURSOR.lastrowid
         type(self).all[self.id] = self
-        
-
     
+    def update(self):
+        # update db with object stored in memory
+        sql = """
+            UPDATE authors
+            SET first_name = ?, last_name = ?
+            WHERE id = ?
+        """
+        CURSOR.execute(sql, (self.first_name, self.last_name))
+        CONN.commit()
+        print(f"Database updated: {self}")
+
+    def delete(self):
+        # remove self from db but keep stored in memory
+        del Author.all[self.id]
+        sql = """
+            DELETE FROM authors
+            WHERE id = ? 
+        """
+        CURSOR.execute(sql, (self.id,))
+        CONN.commit()
+        print(f"Row deleted, object still stored in memory")
+
 
 # CLASS METHODS !!!!!!
     @classmethod
