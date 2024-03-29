@@ -9,9 +9,10 @@ import sqlite3
 import ipdb
 
 def debug():
-    from models.author import Author
-    Author.delete_table()
+    Author.drop_table()
     Author.create_table()
+    Book.drop_table()
+    Book.create_table()
     ipdb.set_trace()
 
 debug()

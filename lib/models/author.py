@@ -2,7 +2,7 @@ from .__init__ import CONN, CURSOR
 
 class Author:
 
-    all = []
+    all = {}
 
     def __init__(self, first_name, last_name, books=[]):
         self.first_name = first_name
@@ -55,12 +55,8 @@ class Author:
         """
         CURSOR.execute(sql, (self.first_name, self.last_name))
         CONN.commit()
-        # Append to all using id from db
-
-    def create(self, first_name, last_name, books=[]):
-        new_author = Author(first_name, last_name, books)
-        new_author.save()
-        return new_author
+        self.id = CURSOR.lastrowid
+        type(self).all[self.id] = self
         
 
     
@@ -79,9 +75,31 @@ class Author:
         CONN.commit()
     
     @classmethod
-    def delete_table(cls):
+    def drop_table(cls):
         sql = """
             DROP TABLE IF EXISTS authors
         """
         CURSOR.execute(sql)
         CONN.commit()
+
+    @classmethod
+    def create(cls, first_name, last_name, books=[]):
+        new_author = Author(first_name, last_name, books)
+        new_author.save()
+        return new_author
+    
+    @classmethod
+    def instance_from_db(cls, row):
+        pass
+
+    @classmethod
+    def get_all(cls):
+        pass
+
+    @classmethod
+    def find_by_id(cls, author_id):
+        pass
+
+    @classmethod
+    def find_by_name(cls, first_name, last_name):
+        pass

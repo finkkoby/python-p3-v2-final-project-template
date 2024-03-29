@@ -3,16 +3,18 @@ from .__init__ import CONN, CURSOR
 
 class Book:
 
-    all = []
+    all = {}
 
-    def __init__(self, title, pages, author):
+    def __init__(self, title, pages, author_id=None):
         self.title = title
         self.pages = pages
-        self.author = author
+        self.author_id = author_id
     
     def __repr__(self):
         return f'<Book: {self.title}, {self.author}, {self.pages}>'
     
+
+# PROPERTIES !!!!!!    
     @property
     def title(self):
         return self._title
@@ -36,12 +38,62 @@ class Book:
         self._pages = pages
     
     @property
-    def author(self):
-        return self._author
-    @author.setter
-    def author(self, author):
-        if not isinstance(author, Author):
-            raise TypeError('Author must be an instance of the Author class')
-        if len(author) < 3:
-            raise ValueError('Author must be at least 3 characters')
-        self._author = author
+    def author_id(self):
+        return self._author_id
+    @author_id.setter
+    def author_id(self, author_id):
+        pass
+        # use find_by_id method from Author class
+
+# INTANCE METHODS !!!!!!
+    def save(self):
+        sql = """
+            INSERT INTO books (title, pages, author_id)
+            VALUES (?, ?, ?)
+        """
+        CURSOR.execute(sql, (self.title, self.pages, self.author_id))
+        CONN.commit()
+        self.id = CURSOR.lastrowid
+        type(self).all[self.id] = self
+
+# CLASS METHODS !!!!!!
+    @classmethod
+    def create_table(cls):
+        sql = """
+            CREATE TABLE IF NOT EXISTS books(
+                id INTEGER PRIMARY KEY,
+                pages INTEGER,
+                author_id INTEGER,
+                FOREIGN KEY (author_id) REFERENCES authors(id)
+            )
+        """
+        CURSOR.execute(sql)
+        CONN.commit()
+    
+    @classmethod
+    def drop_table(cls):
+        sql = """
+            DROP TABLE IF EXISTS books
+        """
+        CURSOR.execute(sql)
+        CONN.commit()
+
+    @classmethod
+    def instance_from_db(cls, row):
+        # returns object that is an instance of the CLS at the ROW in the database
+        pass
+
+    @classmethod
+    def get_all(cls):
+        # a list containing objects that are instances of CLS from db
+        pass
+
+    @classmethod
+    def find_by_id(cls, book_id):
+        # object that is an instance of CLS in db with ID = book_id
+        pass
+
+    @classmethod
+    def find_by_title(cls, title):
+        # object that is an instance of CLS in db with TITLE = title
+        pass
