@@ -4,10 +4,9 @@ class Author:
 
     all = {}
 
-    def __init__(self, first_name, last_name, books=[]):
+    def __init__(self, first_name, last_name):
         self.first_name = first_name
         self.last_name = last_name
-        self.books = books
     
     def __repr__(self):
         return f'<Author: {self.last_name}, {self.first_name}>'
@@ -34,18 +33,6 @@ class Author:
             raise ValueError("Last name must be at least 1 character long")
         self._last_name = last_name
 
-    @property
-    def books(self):
-        return self._books
-    @books.setter
-    def books(self, books):
-        from .book import Book
-        if not isinstance(books, list):
-            raise TypeError("Books must be a list")
-        for book in books:
-            if not isinstance(book, Book):
-                raise TypeError("Books must be instances of the Book class")
-        self._books = books
 
 # INSTANCE METHODS !!!!!!
     def save(self):

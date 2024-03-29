@@ -62,6 +62,7 @@ class Book:
         sql = """
             CREATE TABLE IF NOT EXISTS books(
                 id INTEGER PRIMARY KEY,
+                title TEXT,
                 pages INTEGER,
                 author_id INTEGER,
                 FOREIGN KEY (author_id) REFERENCES authors(id)
@@ -81,7 +82,14 @@ class Book:
     @classmethod
     def instance_from_db(cls, row):
         # returns object that is an instance of the CLS at the ROW in the database
-        pass
+        book = cls.all[row[0]]
+        if book:
+            book.title = row[1]
+            book.pages = row[2]
+            book.author_id = row[3]
+            return book
+        else:
+            raise Exception(f"Book {row[1]} not found")
 
     @classmethod
     def get_all(cls):
