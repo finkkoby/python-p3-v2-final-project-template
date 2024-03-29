@@ -90,16 +90,20 @@ class Author:
     
     @classmethod
     def instance_from_db(cls, row):
+        # returns object that is an instance of the CLS at the ROW in the database
         pass
 
     @classmethod
     def get_all(cls):
+        # a list containing objects that are instances of CLS from db
         pass
 
     @classmethod
     def find_by_id(cls, author_id):
+        # object that is an instance of CLS in db with ID = author_id
         pass
 
     @classmethod
     def find_by_name(cls, first_name, last_name):
+        # object that is an instance of CLS in db with matching first and last name
         pass
