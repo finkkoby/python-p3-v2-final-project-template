@@ -78,19 +78,42 @@ class Author:
     @classmethod
     def instance_from_db(cls, row):
         # returns object that is an instance of the CLS at the ROW in the database
-        pass
+        author = cls.all[row[0]]
+        if author:
+            author.first_name = row[1]
+            author.last_name = row[2]
+            return author
+        else:
+            raise Exception(f"Author {row} not found")
 
     @classmethod
     def get_all(cls):
         # a list containing objects that are instances of CLS from db
-        pass
+        sql = """
+            SELECT *
+            FROM authors
+        """
+        rows = CURSOR.execute(sql).fetchall()
+        return [cls.instance_from_db(row) for row in rows]
 
     @classmethod
     def find_by_id(cls, author_id):
         # object that is an instance of CLS in db with ID = author_id
-        pass
+        sql = """
+            SELECT *
+            FROM authors
+            WHERE id = ?
+        """
+        row = CURSOR.execute(sql, (author_id,)).fetchone()
+        return cls.instance_from_db(row) if row else Exception(f'Author {author_id} not found')
 
     @classmethod
     def find_by_name(cls, first_name, last_name):
         # object that is an instance of CLS in db with matching first and last name
-        pass
+        sql = """
+            SELECT *
+            FROM authors
+            WHERE first_name, last_name = (?, ?)
+        """
+        row = CURSOR.execute(sql, (first_name, last_name)).fetchone()
+        return cls.instance_from_db(row) if row else Exception('Author "{last_name}, {first_name}" not found')

@@ -42,8 +42,10 @@ class Book:
         return self._author_id
     @author_id.setter
     def author_id(self, author_id):
-        self._author_id = author_id
-        # use find_by_id method from Author class
+        if type(author_id) is int and isinstance(Author.find_by_id(author_id), Author):
+            self._author_id = author_id
+        else:
+            raise ValueError("Author {author_id} not found")
 
 # INTANCE METHODS !!!!!!
     def save(self):
