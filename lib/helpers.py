@@ -5,7 +5,9 @@ from models.__init__ import CONN, CURSOR
 import ipdb
 
 def list_authors():
-    print(Author.all)
+    authors = Author.get_all()
+    for author in authors:
+        print(author)
 
 def find_author_by_name():
     pass
