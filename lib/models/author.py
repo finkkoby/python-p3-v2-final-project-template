@@ -70,8 +70,8 @@ class Author:
         CONN.commit()
 
     @classmethod
-    def create(cls, first_name, last_name, books=[]):
-        new_author = Author(first_name, last_name, books)
+    def create(cls, first_name, last_name):
+        new_author = Author(first_name, last_name)
         new_author.save()
         return new_author
     

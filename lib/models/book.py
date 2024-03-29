@@ -11,7 +11,7 @@ class Book:
         self.author_id = author_id
     
     def __repr__(self):
-        return f'<Book: {self.title}, {self.author}, {self.pages}>'
+        return f'<Book: {self.title}, {self.pages}, {self.author_id}>'
     
 
 # PROPERTIES !!!!!!    
@@ -42,7 +42,7 @@ class Book:
         return self._author_id
     @author_id.setter
     def author_id(self, author_id):
-        pass
+        self._author_id = author_id
         # use find_by_id method from Author class
 
 # INTANCE METHODS !!!!!!
@@ -80,6 +80,12 @@ class Book:
         CONN.commit()
 
     @classmethod
+    def create(cls, title, pages, author_id):
+        new_book = Book(title, pages, author_id)
+        new_book.save()
+        return new_book
+
+    @classmethod
     def instance_from_db(cls, row):
         # returns object that is an instance of the CLS at the ROW in the database
         book = cls.all[row[0]]
@@ -94,14 +100,33 @@ class Book:
     @classmethod
     def get_all(cls):
         # a list containing objects that are instances of CLS from db
-        pass
+        sql = """
+            SELECT *
+            FROM books
+        """
+        CURSOR.execute(sql)
+        books = CURSOR.fetchall()
+        return [cls.instance_from_db(book) for book in books]
 
     @classmethod
     def find_by_id(cls, book_id):
         # object that is an instance of CLS in db with ID = book_id
-        pass
+        book_id = str(book_id)
+        sql = """
+            SELECT *
+            FROM books
+            WHERE id = ?
+        """
+        row = CURSOR.execute(sql, (book_id,)).fetchone()
+        return cls.instance_from_db(row) if row else f"Book '{book_id}' not found"
 
     @classmethod
     def find_by_title(cls, title):
         # object that is an instance of CLS in db with TITLE = title
-        pass
+        sql = """
+            SELECT *
+            FROM books
+            WHERE title = ?
+        """
+        row = CURSOR.execute(sql, (title,)).fetchone()
+        return cls.instance_from_db(row) if row else f"Book '{title}' not found"
