@@ -67,6 +67,14 @@ class Author:
         CONN.commit()
         print(f"Row deleted, object still stored in memory")
 
+    def books(self):
+        sql = """
+            SELECT *
+            FROM books
+            WHERE id = ?
+        """
+        return CURSOR.execute(sql, (self.id,)).fetchall()
+
 
 # CLASS METHODS !!!!!!
     @classmethod
@@ -99,12 +107,16 @@ class Author:
     def instance_from_db(cls, row):
         # returns object that is an instance of the CLS at the ROW in the database
         author = cls.all.get(row[0])
-        if author is not None:
+        if author:
+            # ensure attributes match row values in case local instance was modified
             author.first_name = row[1]
             author.last_name = row[2]
-            return author
         else:
-            raise Exception(f"Author {row} not found")
+            # not in dictionary, create new instance and add to dictionary
+            author = cls(row[1], row[2])
+            author.id = row[0]
+            cls.all[author.id] = author
+        return author
 
     @classmethod
     def get_all(cls):

@@ -16,6 +16,8 @@ from helpers import (
     list_author_books,
     show_more
 )
+import seed
+
 def main():
     print(f"\nWelcome to my bookshelf!\n")
     while True:

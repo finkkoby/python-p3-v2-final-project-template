@@ -2,7 +2,6 @@
 from models.author import Author
 from models.book import Book
 from models.__init__ import CONN, CURSOR
-import seed
 import ipdb
 
 def list_authors():
@@ -11,21 +10,24 @@ def list_authors():
     for author in authors:
         print(f"-- {author.first_name} {author.last_name}")
 
-def find_author_by_name():
+def collect_author_name():
     while True:
         first_name = input('Enter author FIRST name: ')
         last_name = input('Enter author LAST name: ')
         check_input = input(f'Search for "{last_name}, {first_name}"? Y / N >> ')
         if check_input == "Y":
-            author = Author.find_by_name(first_name, last_name)
-            print(f"Fetching author info...")
-            print(f"\n{first_name} {last_name}\n")
-            show_books(author)
-            return
+            return Author.find_by_name(first_name, last_name)
         elif check_input == "N":
             pass
         else:
             print("Invalid input")
+
+def find_author_by_name():
+    author = collect_author_name()
+    print(f"Fetching author info...")
+    print(f"\n{author.first_name} {author.last_name}\n")
+    show_books(author)
+    return
             
 def find_author_by_id():
     pass
@@ -51,9 +53,10 @@ def delete_book():
 
 def list_author_books(author=None):
     if author is None:
-        pass
-        # input stuff here
-    books = 
+        author = collect_author_name()
+    books = [book for book in author.books() if len(author.books()) > 0]
+    for book in books:
+        print(f"\n'{book.title}', {book.pages} pages")
 
 
 

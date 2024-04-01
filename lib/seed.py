@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# lib/debug.py
 
 from models.__init__ import CONN, CURSOR
 from models.author import Author
@@ -18,5 +17,8 @@ def seed_database():
     Book.create("The Seven Husbands of Evelyn Hugo", 400, author_2.id)
     Book.create("Maybe in Another Life", 352, author_2.id)
 
-seed_database()
-print("Database seeded")
+
+
+if __name__ == '__main__':
+    seed_database()
+    print("Database seeded")

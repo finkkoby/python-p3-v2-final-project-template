@@ -117,9 +117,12 @@ class Book:
             book.title = row[1]
             book.pages = row[2]
             book.author_id = row[3]
-            return book
         else:
-            raise Exception(f"Book {row[1]} not found")
+            book = cls(row[1], row[2], row[3])
+            book.id = row[0]
+            cls.all[book.id] = book
+        return book
+
 
     @classmethod
     def get_all(cls):
