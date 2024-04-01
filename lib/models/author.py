@@ -52,9 +52,8 @@ class Author:
             SET first_name = ?, last_name = ?
             WHERE id = ?
         """
-        CURSOR.execute(sql, (self.first_name, self.last_name))
+        CURSOR.execute(sql, (self.first_name, self.last_name, self.id))
         CONN.commit()
-        print(f"Database updated: {self}")
 
     def delete(self):
         # remove self from db but keep stored in memory
@@ -65,7 +64,6 @@ class Author:
         """
         CURSOR.execute(sql, (self.id,))
         CONN.commit()
-        print(f"Row deleted, object still stored in memory")
 
     def books(self):
         from .book import Book

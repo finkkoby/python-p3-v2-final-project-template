@@ -45,7 +45,7 @@ class Book:
         if type(author_id) is int and isinstance(Author.find_by_id(author_id), Author):
             self._author_id = author_id
         else:
-            raise ValueError("Author {author_id} not found")
+            raise ValueError(f"Author {author_id} not found")
 
 # INTANCE METHODS !!!!!!
     def save(self):
