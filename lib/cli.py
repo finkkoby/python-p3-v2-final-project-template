@@ -16,7 +16,6 @@ from helpers import (
     list_author_books,
     show_more
 )
-import seed
 
 def main():
     print(f"\nWelcome to my bookshelf!\n")
@@ -60,7 +59,7 @@ def settings():
 
 
 def menu():
-    print("Please select an option:")
+    print("\nPlease select an option:")
     print("0. Exit the program")
     print("1. List all authors")
     print("2. Find author by name")

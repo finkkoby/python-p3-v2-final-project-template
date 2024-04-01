@@ -68,12 +68,14 @@ class Author:
         print(f"Row deleted, object still stored in memory")
 
     def books(self):
+        from .book import Book
         sql = """
             SELECT *
             FROM books
-            WHERE id = ?
+            WHERE author_id = ?
         """
-        return CURSOR.execute(sql, (self.id,)).fetchall()
+        books = CURSOR.execute(sql, (self.id,)).fetchall()
+        return [Book.instance_from_db(book) for book in books]
 
 
 # CLASS METHODS !!!!!!

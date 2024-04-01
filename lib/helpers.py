@@ -5,7 +5,7 @@ from models.__init__ import CONN, CURSOR
 import ipdb
 
 def list_authors():
-    print("Fetching all artists..")
+    print("\nFetching all authors...\n")
     authors = Author.get_all()
     for author in authors:
         print(f"-- {author.first_name} {author.last_name}")
@@ -23,14 +23,38 @@ def collect_author_name():
             print("Invalid input")
 
 def find_author_by_name():
-    author = collect_author_name()
-    print(f"Fetching author info...")
-    print(f"\n{author.first_name} {author.last_name}\n")
-    show_books(author)
-    return
+    while True:
+        author = collect_author_name()
+        if isinstance(author, Author):
+            print(f"\nFetching author info...")
+            print(f"\n{author.first_name} {author.last_name}\n")
+            show_books(author)
+            return
+        else:
+            print("\nI can't find an author with that name.\n")
+            answer = input("Try again? Y / N >> ")
+            if answer == "Y":
+                pass
+            elif answer == "N":
+                return
             
 def find_author_by_id():
-    pass
+    while True:
+        _id = input('Enter author id: ')
+        author = Author.find_by_id(_id)
+        if isinstance(author, Author):
+            print(f"\nFetching author info...")
+            print(f"\n{author.first_name} {author.last_name}\n")
+            show_books(author)
+            return
+        else:
+            print("\nI can't find an author with that id.\n")
+            answer = input("Try again? Y / N >> ")
+            if answer == "Y":
+                pass
+            elif answer == "N":
+                return
+
 def create_author():
     pass
 def update_author():
@@ -39,11 +63,36 @@ def delete_author():
     pass
 
 def list_books():
-    pass
+    print("\nFetching all books...\n")
+    books = Book.get_all()
+    for book in books:
+        author = Author.find_by_id(book.author_id)
+        print(f"-- '{book.title}', {author.first_name} {author.last_name}, {book.pages} pages")
+    
 def find_book_by_name():
-    pass
+    while True:
+        title = input('Enter book title: ')
+        book = Book.find_by_title(title)
+        print("\nLet me grab that for you...\n")
+        if isinstance(book, Book):
+            author = Author.find_by_id(book.author_id)
+            print(f"-- '{book.title}', {author.first_name} {author.last_name}, {book.pages} pages")
+            return
+        else:
+            print(f"Looks like we don't have '{title}'\n")
+            answer = input("Try again? Y / N >> ")
+            if answer == "Y":
+                pass
+            elif answer == "N":
+                return
+
+
 def find_book_by_id():
-    pass
+    _id = input('Enter book id: ')
+    book = Book.find_by_id(_id)
+
+    if isinstance(book, Book):
+        print()
 def create_book():
     pass
 def update_book():
@@ -54,9 +103,10 @@ def delete_book():
 def list_author_books(author=None):
     if author is None:
         author = collect_author_name()
+    print("\nFetching books...\n")
     books = [book for book in author.books() if len(author.books()) > 0]
     for book in books:
-        print(f"\n'{book.title}', {book.pages} pages")
+        print(f"'{book.title}', {book.pages} pages")
 
 
 
@@ -66,7 +116,7 @@ def exit_program():
 
 def show_more():
     while True:
-        answer = input("Anything else? Y / N >> ")
+        answer = input("\nAnything else? Y / N >> ")
         if answer == "Y":
             return
         elif answer == "N":
