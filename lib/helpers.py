@@ -364,9 +364,11 @@ def show_by():
     while True:
         answer = input('\nShow by (1) BOOK TITLE or by (2) AUTHOR? >> ')
         if answer == '1':
-            return book_menu()
+            book_menu()
+            return
         elif answer == '2':
-            return author_menu()
+            author_menu()
+            return
         else:
             print('Invalid input')
 
@@ -375,14 +377,14 @@ def book_menu(display=True):
         bookshelf_display()
     else:
         print('\n(L) Back to books list\n')
-    answer = show_more('book')
-    return ['book', answer]
+    show_more('book')
+    return
 
 def author_menu(display=True):
     if display:
         author_display()
-    answer = show_more('author')
-    return ['author', answer]
+    show_more('author')
+    return
 
 def bookshelf_display(display=True):
     print('\n--------------------------------')
@@ -441,7 +443,7 @@ def author_actions(_id, display=False):
         answer = input('>> ')
         if answer == '1':
             update_author(_id)
-            author_actions(_id)
+            author_actions(_id, True)
             return
         elif answer == '2':
             author_book_display(Author.find_by_id(_id))
@@ -450,7 +452,7 @@ def author_actions(_id, display=False):
             create_book(_id)
         elif answer == '4':
             answer = author_menu()
-            type_menu(answer)
+            author_actions(_id, True)
             return
         elif answer.upper() == 'B':
             back_to_menu()
@@ -470,15 +472,8 @@ def author_book_display(author):
         book_menu(False)
 
 def main_menu():
-    answer = show_by()
-    type_menu(answer)
+    show_by()
 
-def type_menu(answer):
-    while True:
-        if answer[0] == 'book':
-            book_actions(answer[1])
-        elif answer[0] == 'author':
-            author_actions(answer[1])
 
 def back_to_menu():
     main_menu()
