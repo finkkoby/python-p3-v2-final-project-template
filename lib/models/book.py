@@ -67,7 +67,6 @@ class Book:
         """
         CURSOR.execute(sql, (self.title, self.pages, self.author_id, self.id))
         CONN.commit()
-        print(f"Database updated: {self}")
 
     def delete(self):
         # remove self from db but keep stored in memory
@@ -78,7 +77,6 @@ class Book:
         """
         CURSOR.execute(sql, (self.id,))
         CONN.commit()
-        print(f"Row deleted, object is still stored in memory")
 
 # CLASS METHODS !!!!!!
     @classmethod
