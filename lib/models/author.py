@@ -148,4 +148,4 @@ class Author:
             WHERE (first_name, last_name) = (?, ?)
         """
         row = CURSOR.execute(sql, (first_name, last_name)).fetchone()
-        return cls.instance_from_db(row) if row else Exception('Author "{last_name}, {first_name}" not found')
+        return cls.instance_from_db(row) if row else None

@@ -3,286 +3,177 @@ from models.author import Author
 from models.book import Book
 from models.__init__ import CONN, CURSOR
 import ipdb
+import time
 
 def list_authors():
-    print("\nFetching all authors...\n")
     authors = Author.get_all()
     for i, author in enumerate(authors, start=1):
         print(f"{i}. {author.first_name} {author.last_name}")
 
-def collect_author_name():
-    while True:
-        first_name = input('Enter author FIRST name: ')
-        last_name = input('Enter author LAST name: ')
-        check_input = input(f'Search for "{last_name}, {first_name}"? Y / N >> ')
-        if check_input.upper() == "Y":
-            return Author.find_by_name(first_name, last_name)
-        elif check_input.upper() == "N":
-            pass
-        else:
-            print("Invalid input")
-
-def find_author_by_name():
-    while True:
-        author = collect_author_name()
-        print(f"\nFetching author info...")
-        if isinstance(author, Author):
-            print(f"\n{author.first_name} {author.last_name}\n")
-            show_books(author)
-            return
-        else:
-            print("\nI can't find an author with that name.\n")
-            answer = input("Try again? Y / N >> ")
-            if answer.upper() == "Y":
-                pass
-            elif answer.upper() == "N":
-                return
-            else:
-                print("Invalid input")
-            
-def find_author_by_id():
-    while True:
-        _id = input('Enter author id: ')
-        author = Author.find_by_id(_id)
-        print(f"\nFetching author info...")
-        if isinstance(author, Author):
-            print(f"\n{author.first_name} {author.last_name}\n")
-            show_books(author)
-            return
-        else:
-            print("\nI can't find an author with that id.\n")
-            answer = input("Try again? Y / N >> ")
-            if answer.upper() == "Y":
-                pass
-            elif answer.upper() == "N":
-                return
-            else:
-                print("Invalid input")
-
 def create_author():
+    flag = True
+    while flag:
+        print('\n\n <*- -=--  CREATE AN AUTHOR  --=- -*> \n')
+        name = collect_author_name()
+        author = Author.find_by_name(name[0], name[1])
+        if author:
+            print(f"\nWe already have '{author.last_name}, {author.first_name}' in our records.")
+            time.sleep(1)
+            flag = try_again()
+        else:
+            new_author = Author.create(name[0], name[1])
+            print(f"\nAuthor '{new_author.last_name}, {new_author.first_name}' created!")
+            time.sleep(1)
+            return author
+
+def update_author(author):
+    print('\n\n <*- -=--  UPDATE AN AUTHOR  --=- -*> \n')
+    name = collect_author_name()
+    author.first_name = name[0]
+    author.last_name = name[1]
+    author.update()
+    print(f"\n'{author.last_name}, {author.first_name}' updated!")
+    time.sleep(1)
+
+def delete_author():
+    flag = True
+    while flag:
+        print('\n\n <*- -=--  DELETE AN AUTHOR  --=- -*> \n')
+        author = select_author()
+        answer = input(f"\nDelete '{author.last_name}, {author.first_name}'? Y / N >> ")
+        if answer.upper() == "Y":
+            if len(author.books()) == 0:
+                author.delete()
+                print(f"\n'{author.last_name}, {author.first_name}' deleted.")
+                time.sleep(1)
+                flag = False
+            else:
+                print(f"\n'{author.last_name}, {author.first_name}' can't be deleted.")
+                print('\nIt looks like we still have a few books by that author on the shelf.')
+                list_author_books(author)
+                flag = try_again()
+        elif answer.upper() == "N":
+            flag = try_again()
+        else:
+            print("\n ** Invalid input **")
+
+def select_author():
+    author_display(False)
     while True:
+        _id = input("\nSELECT author from list: ")
+        try:
+            _id = int(_id)
+            author = Author.find_by_id(_id)
+            return author
+        except:
+            print('\n ** Invalid input **')
+
+def collect_author_name():
+    flag = True
+    while flag:
         first_name = input('Enter author FIRST name: ')
         last_name = input('Enter author LAST name: ')
-        check_author = Author.find_by_name(first_name, last_name)
-        if isinstance(check_author, Author):
-            print("\nWe already have '{last_name}, {first_name}' in our records.")
-            answer = input("\nTry again? Y / N >> ")
-            if answer.upper() == "Y":
-                pass
-            elif answer.upper() == "N":
-                return
-            else:
-                print("Invalid input")
-        else:
-            check_input = input(f'\nCreate "{last_name}, {first_name}"? Y / N >> ')
-            if check_input.upper() == "Y":
-                author = Author.create(first_name, last_name)
-                print(f"\nAuthor '{last_name}, {first_name}' created!")
-                return author.id
-            elif check_input.upper() == "N":
-                pass
+        flag = verify_author_name(first_name, last_name)
+    return [first_name, last_name]
 
-def update_author(_id):
+def verify_author_name(first_name, last_name):
     while True:
-        author = Author.find_by_id(_id)
-        first_name = input('Enter author FIRST name: ')
-        last_name = input('Enter author LAST name: ')
-        if first_name != '':
-            author.first_name = first_name
-        if last_name != '':
-            author.last_name = last_name
-        author.update()
-        print(f"\n'{author.last_name}, {author.first_name}' updated!")
-        return
-
-def delete_author(_id=None):
-    while True:
-        if _id is None:
-            _id = input("SELECT author from list:")
-            author = Author.find_by_id(_id)
+        check_input = input(f' "{last_name}, {first_name}"? Y / N >> ')
+        if check_input.upper() == "Y":
+            return False
+        elif check_input.upper() == "N":
+            return True
         else:
-            author = Author.find_by_id(_id)
-        if isinstance(author, Author):
-            answer = input(f"\nDelete '{author.last_name}, {author.first_name}'? Y / N >> ")
-            if answer.upper() == "Y":
-                if len(author.books()) == 0:
-                    author.delete()
-                    print(f"\n'{author.last_name}, {author.first_name}' deleted.")
-                    return
-                else:
-                    print(f"\n'{author.last_name}, {author.first_name}' can't be deleted.")
-                    print('\nIt looks like we still have a few books by that author on the shelf.')
-                    list_author_books(author)
-                    answer = input("\nTry again? Y / N >> ")
-                    if answer.upper() == "Y":
-                        pass
-                    elif answer.upper() == "N":
-                        return
-                    else:
-                        print("Invalid input")
-                        return
-            elif answer.upper() == "N":
-                return
-            else:
-                print("\nInvalid input")
-        else:
-            print("\nI can't find an author with that id.\n")
-            answer = input("Try again? Y / N >> ")
-            if answer.upper() == "Y":
-                pass
-            elif answer.upper() == "N":
-                return
-            else:
-                print("Invalid input")
+            print("\n ** Invalid input **")
 
 def list_books():
-    print("\nFetching all books...\n")
     books = Book.get_all()
-    for book in books:
+    for i, book in enumerate(books, start=1):
         author = Author.find_by_id(book.author_id)
-        print(f"-- '{book.title}', {author.first_name} {author.last_name}, {book.pages} pages")
+        print(f" {i} -- '{book.title}', {author.first_name} {author.last_name}, {book.pages} pages")     
     
-def find_book_by_name():
-    while True:
-        title = input('Enter book title: ')
-        book = Book.find_by_title(title)
-        print("\nLet me grab that for you...\n")
-        if isinstance(book, Book):
-            author = Author.find_by_id(book.author_id)
-            print(f"-- '{book.title}', {author.first_name} {author.last_name}, {book.pages} pages")
-            return
-        else:
-            print(f"Looks like we don't have '{title}'\n")
-            answer = input("Try again? Y / N >> ")
-            if answer.upper() == "Y":
-                pass
-            elif answer.upper() == "N":
-                return
-            else:
-                print("Invalid input")
-
-
-def find_book_by_id():
-    _id = input('Enter book id: ')
-    book = Book.find_by_id(_id)
-    print("\nLet me grab that for you...\n")
-    if isinstance(book, Book):
-        author = Author.find_by_id(book.author_id)
-        print(f"-- '{book.title}', {author.first_name} {author.last_name}, {book.pages} pages")
-        return
-    else:
-        print(f"Looks like we don't have a book with that id\n")
-        answer = input("Try again? Y / N >> ")
-        if answer.upper() == "Y":
-            pass
-        elif answer.upper() == "N":
-            return
-        else:
-            print("Invalid input")
-
-        
-        
-def create_book(_id=None):
-    while True:
-        title = input('Enter book title: ')
-        pages = input('Enter number of pages in book: ')
-        if _id is None:
-            author_display(False)
-            author_id = input('\nEnter author from list: ')
-        else:
-            author_id = _id
-        if author_id == '+':
-            author_id = create_author()
-        elif author_id.upper() == 'B':
-            back_to_menu()
-        check_author = Author.find_by_id(int(author_id))
-        if not isinstance(check_author, Author):
-            print("\nInvalid input")
-            answer = input("Would you like to create a new author? Y / N >> ")
-            if answer == "Y":
-                author_id = create_author()
-                check_author = Author.find_by_id(author_id)
-            elif answer.upper() == "N":
-                answer = input("Try again? Y / N >> ")
-                if answer.upper() == "Y":
-                    pass
-                elif answer.upper() == "N":
-                    return
-                else:
-                    print("Invalid input")
-            else:
-                print("Invalid input")
-        check_book = Book.find_by_title(title)
-        if not isinstance(check_book, Book):
-            check_input = input(f'\nReturn -- "{title}" by {check_author.first_name} {check_author.last_name}, {pages} pages -- ? Y / N >> ')
-            if check_input.upper() == "Y":
-                book = Book.create(title, int(pages), int(author_id))
-                print(f"\n-- '{book.title}' by {check_author.first_name} {check_author.last_name}, {book.pages} pages -- returned!")
-                return
-            elif check_input.upper() == "N":
-                answer = input("Try again? Y / N >> ")
-                if answer.upper() == "Y":
-                    pass
-                elif answer.upper() == "N":
-                    return
-                else:
-                    print("Invalid input")
-        elif isinstance(check_book, Book):
+def create_book(author=None):
+    print('\n\n <*- -=--  ADD A BOOK  --=- -*> \n')
+    flag = True
+    while flag:
+        info = collect_book_info(author)
+        book = Book.find_by_title(info[0])
+        if book:
             print('\nLooks like we already have a book with that title.\n')
-            answer = input("Try again? Y / N >> ")
-            if answer.upper() == "Y":
-                pass
-            elif answer.upper() == "N":
-                return
-            else:
-                print("Invalid input")
+            flag = try_again()
         else:
-            print('\nOops! Something went wrong.\n')
-            answer = input("Try again? Y / N >> ")
-            if answer.upper() == "Y":
-                pass
-            elif answer.upper() == "N":
-                return
-            else:
-                print("Invalid input")
+            book = Book.create(info[0], info[1], info[2])
+            print(f"\n-- '{book.title}' by {info[2].first_name} {info[2].last_name}, {book.pages} pages -- created!")
+            time.sleep(1)
+            flag = False
     
-def update_book(_id):
-    while True:
-        book = Book.find_by_id(_id)
-        title = input('Enter book title: ')
-        pages = input('Enter number of pages in book: ')
-        author_display(False)
-        author_id = input('SELECT author from list: ')
-        if title != '':
-            book.title = title
-        if pages != '':
-            book.pages = int(pages)
-        if author_id != '':
-            book.author_id = int(author_id)
-        book.update()
-        author = Author.find_by_id(book.author_id)
-        print(f"\n-- '{book.title}', {author.first_name} {author.last_name}, {book.pages} pages -- updated!")
-        return
+def update_book(book):
+    print('\n\n <*- -=--  UPDATE A BOOK  --=- -*> \n')
+    info = collect_book_info()
+    book.title = info[0]
+    book.pages = info[1]
+    book.author = info[2]
+    book.update()
+    print(f"\n-- '{book.title}', {info[2].first_name} {info[2].last_name}, {book.pages} pages -- updated!")
+    time.sleep(1)
 
-def delete_book(_id=None):
-    while True:
-        if _id is None:
-            _id = input('\nSELECT book from list: ')
-        book = Book.find_by_id(_id)
+def delete_book(book=None):
+    print('\n\n <*- -=--  CHECK OUT A BOOK  --=- -*> \n')
+    flag = True
+    while flag:
+        if not book:
+            book = select_book()
         answer = input(f"\nCheck out -- '{book.title}', {book.pages} pages -- ? Y / N >> ")
         if answer.upper() == "Y":
             book.delete()
             print(f"\n-- '{book.title}', {book.pages} pages -- checked out.")
-            return
+            time.sleep(1)
+            flag = False
         elif answer.upper() == "N":
-            return
+            flag = False
         else:
-            print("\nInvalid input")
+            print("\n ** Invalid input **")
+
+def collect_book_info(book=None):
+    flag = True
+    while flag:
+        title = input('Enter book title: ')
+        while True:
+            try:
+                pages = int(input('Enter number of pages in book: '))
+                break
+            except:
+                print('\n ** Invalid input **')
+        if not author:
+            author = select_author()
+        flag = verify_book_info(title, pages, author)
+    return[title, pages, author]
+
+def select_book():
+    bookshelf_display(False)
+    while True:
+        _id = input('\nSELECT book from list: ')
+        try:
+            _id = int(_id)
+            book = Book.find_by_id(_id)
+            return book
+        except:
+            print('\n ** Invalid input **')
+
+def verify_book_info(title, pages, author):
+    while True:
+        check_input = input(f'\n "{title}" by {author.first_name} {author.last_name}, {pages} pages -- ? Y / N >> ')
+        if check_input.upper() == "Y":
+            return False
+        elif check_input.upper() == "N":
+            return True
+        else:
+            print("\n ** Invalid input **")
+        
 
 def list_author_books(author=None):
-    if author is None:
+    if not author:
         author = collect_author_name()
-    print("\nFetching books...\n")
     books = [book for book in author.books() if len(author.books()) > 0]
     for book in books:
         print(f"'{book.title}', {book.pages} pages")
@@ -302,28 +193,27 @@ def show_more(string):
             back_to_menu()
             return
         elif answer.upper() == 'L':
-            type_menu(author_menu())
+            author_menu()
             return
         elif answer.upper() == 'R':
             create_book()
-            type_menu(book_menu())
+            book_menu()
             return
         elif answer.upper() == 'C':
             delete_book()
-            type_menu(book_menu())
+            book_menu()
             return
         elif answer.upper() == 'A':
             return author_menu()
         elif answer.upper() == 'S':
             return book_menu()
-
         elif answer == '+':
             create_author()
-            type_menu(author_menu())
+            author_menu()
             return
         elif answer == '-':
             delete_author()
-            type_menu(author_menu())
+            author_menu()
             return
         elif int(answer):
             if string == 'book':
@@ -332,7 +222,7 @@ def show_more(string):
                 if isinstance(book, Book):
                     author = Author.find_by_id(book.author_id)
                     print(f'{book.title}, {author.first_name} {author.last_name}, {book.pages} pages')
-                    book_actions(book.id)
+                    book_actions(book)
                     return
                 else:
                     print("\nHmmm...I can't seem to find that one. Try again.\n")
@@ -341,12 +231,12 @@ def show_more(string):
                 author = Author.find_by_id(int(answer))
                 if isinstance(author, Author):
                     print(f'{author.last_name}, {author.first_name}')
-                    author_actions(author.id)
+                    author_actions(author)
                     return
                 else:
                     print("\nHmmm...I can't seem to find that one. Try again.\n")
         else:
-            print("Invalid input")
+            print("\n ** Invalid input **")
         
 
 def show_books(author):
@@ -358,21 +248,11 @@ def show_books(author):
         elif answer.upper() == "N":
             return
         else:
-            print("Invalid input")
-
-def show_by():
-    while True:
-        answer = input('\nShow by (1) BOOK TITLE or by (2) AUTHOR? >> ')
-        if answer == '1':
-            book_menu()
-            return
-        elif answer == '2':
-            author_menu()
-            return
-        else:
-            print('Invalid input')
+            print("\n ** Invalid input **")
 
 def book_menu(display=True):
+    print('\n\n <*- -=--  BOOKS  --=- -*> \n')
+    print("Here are all of the books that are available:\n")
     if display:
         bookshelf_display()
     else:
@@ -382,77 +262,70 @@ def book_menu(display=True):
 
 def author_menu(display=True):
     if display:
+        print('\n\n <*- -=--  AUTHORS  --=- -*> \n')
+        print("Here are the authors in our collection:\n")
         author_display()
     show_more('author')
     return
 
 def bookshelf_display(display=True):
-    print('\n--------------------------------')
-    print("Here are all of the books that are available:\n")
-    for i, book in enumerate(Book.get_all(), start=1):
-        author = Author.find_by_id(book.author_id)
-        print(f'{i} -- {book.title}, {author.first_name} {author.last_name}, {book.pages} pages')
+    list_books()
     if display:
-        print('\n(R) Return a book')
+        print('\n(R) Add a book')
         print('(C) Check out a book')
         print('(A) Show authors')
         print('(B) Back to menu\n')
         print('OR')
-        print('\nEnter any number to take a book of the shelf!\n')
+        print('\nEnter any number to take a book off the shelf!\n')
 
 def author_display(display=True):
-    print('\n--------------------------------')
-    print("Here are the authors in our collection: \n")
-    for i, author in enumerate(Author.get_all(), start=1):
-        print(f'{i} -- {author.last_name}, {author.first_name}')
+    list_authors()
     if display:
         print('\n(+) Add an author')
         print('(-) Remove an author')
         print('(S) Show books')
         print('(B) Back to menu\n')
 
-def book_actions(_id, display=False):
+def book_actions(book, display=False):
     while True:
         if display:
             print('\n--------------------------------')
-            book = Book.find_by_id(_id)
             author = Author.find_by_id(book.author_id)
             print(f'{book.title}, {author.first_name} {author.last_name}, {book.pages} pages')
         print("\n(1) Update book\n(2) Check out book\n(3) Back to books\n")
         answer = input('>> ')
         if answer == '1':
-            update_book(_id)
-            book_actions(_id, True)
+            update_book(book)
+            book_actions(book, True)
             return
         elif answer == '2':
-            delete_book(_id)
+            delete_book(book)
             book_menu()
             return
         elif answer == '3':
             book_menu()
             return
 
-def author_actions(_id, display=False):
+def author_actions(author, display=False):
     while True:
         if display:
-            author = Author.find_by_id(_id)
             print('\n--------------------------------')
             print(f'{author.last_name}, {author.first_name}')
-        print("\n(1) Update author\n(2) Show books by author\n(3) Return book by author \n(4) Back to authors\n")
+        print("\n(1) Update author\n(2) Show books by author\n(3) Add book by author \n(4) Back to authors\n")
         print('(B) Back to menu\n')
         answer = input('>> ')
         if answer == '1':
-            update_author(_id)
-            author_actions(_id, True)
+            update_author(author)
+            author_actions(author, True)
             return
         elif answer == '2':
-            author_book_display(Author.find_by_id(_id))
+            author_book_display(author)
             return
         elif answer == '3':
-            create_book(_id)
+            create_book(author)
         elif answer == '4':
             answer = author_menu()
-            author_actions(_id, True)
+            author_actions(author, True)
             return
         elif answer.upper() == 'B':
             back_to_menu()
@@ -471,9 +344,12 @@ def author_book_display(author):
             print(f'{book.id} -- {book.title}, {author.first_name} {author.last_name}, {book.pages} pages')
         book_menu(False)
 
-def main_menu():
-    show_by()
-
-
-def back_to_menu():
-    main_menu()
+def try_again():
+    while True:
+        answer = input("\nTry again? Y / N >> ")
+        if answer.upper() == "Y":
+            return True
+        elif answer.upper() == "N":
+            return False
+        else:
+            print("\n ** Invalid input **")

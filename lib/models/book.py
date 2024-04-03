@@ -154,4 +154,4 @@ class Book:
             WHERE title = ?
         """
         row = CURSOR.execute(sql, (title,)).fetchone()
-        return cls.instance_from_db(row) if row else f"Book '{title}' not found"
+        return cls.instance_from_db(row) if row else None
