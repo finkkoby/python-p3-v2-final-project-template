@@ -17,9 +17,9 @@ class Author:
     @first_name.setter
     def first_name(self, first_name):
         if not isinstance(first_name, str):
-            raise TypeError("First name must be a string")
+            raise Exception("First name must be a string")
         if len(first_name) < 1:
-            raise ValueError("First name must be at least 1 character long")
+            raise Exception("First name must be at least 1 character long")
         self._first_name = first_name
 
     @property
@@ -28,9 +28,9 @@ class Author:
     @last_name.setter
     def last_name(self, last_name):
         if not isinstance(last_name, str):
-            raise TypeError("Last name must be a string")
+            raise Exception("Last name must be a string")
         if len(last_name) < 1:
-            raise ValueError("Last name must be at least 1 character long")
+            raise Exception("Last name must be at least 1 character long")
         self._last_name = last_name
 
 

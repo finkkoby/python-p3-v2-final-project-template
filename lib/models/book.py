@@ -21,9 +21,9 @@ class Book:
     @title.setter
     def title(self, title):
         if not isinstance(title, str):
-            raise TypeError('Title must be a string')
+            raise Exception('Title must be a string')
         if len(title) < 3:
-            raise ValueError('Title must be at least 3 characters')
+            raise Exception('Title must be at least 3 characters')
         self._title = title
 
     @property
@@ -32,9 +32,9 @@ class Book:
     @pages.setter
     def pages(self, pages):
         if not isinstance(pages, int):
-            raise TypeError('Pages must be an integer')
+            raise Exception('Pages must be a number')
         if pages < 1:
-            raise ValueError('Pages must be at least 1')
+            raise Exception('Book must be at least 1 page long')
         self._pages = pages
     
     @property
@@ -45,7 +45,7 @@ class Book:
         if type(author_id) is int and isinstance(Author.find_by_id(author_id), Author):
             self._author_id = author_id
         else:
-            raise ValueError(f"Author {author_id} not found")
+            raise Exception(f"Author not found")
 
 # INTANCE METHODS !!!!!!
     def save(self):

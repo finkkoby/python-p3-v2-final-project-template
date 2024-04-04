@@ -7,8 +7,8 @@ import time
 
 def list_authors():
     authors = Author.get_all()
-    for i, author in enumerate(authors, start=1):
-        print(f"{i} -- {author.first_name} {author.last_name}")
+    for author in authors:
+        print(f"{author.id} -- {author.first_name} {author.last_name}")
 
 def find_author_by_id(_id):
     return Author.find_by_id(_id)
@@ -24,10 +24,15 @@ def create_author():
             time.sleep(1)
             flag = try_again()
         else:
-            new_author = Author.create(name[0], name[1])
-            print(f"\n-- '{new_author.last_name}, {new_author.first_name}' -- created!")
-            time.sleep(1)
-            return author
+            try:
+                new_author = Author.create(name[0], name[1])
+                print(f"\n-- '{new_author.last_name}, {new_author.first_name}' -- created!")
+                time.sleep(1)
+                return author
+            except Exception as e:
+                print(f'\n ** {e} **')
+                time.sleep(1)
+                flag = try_again()
 
 def update_author(author):
     print('\n\n <*- -=--  UPDATE AN AUTHOR  --=- -*> \n')
@@ -53,7 +58,7 @@ def delete_author():
             else:
                 print(f"\n'{author.last_name}, {author.first_name}' can't be deleted.")
                 print('\nIt looks like we still have a few books by that author on the shelf.')
-                list_author_books(author)
+                author_book_display(author)
                 flag = try_again()
         elif answer.upper() == "N":
             flag = try_again()
@@ -113,21 +118,34 @@ def create_book(author=None):
             print('\nLooks like we already have a book with that title.\n')
             flag = try_again()
         else:
-            book = Book.create(info[0], info[1], info[2].id)
-            print(f"\n-- '{book.title}' by {info[2].first_name} {info[2].last_name}, {book.pages} pages -- created!")
-            Book.update_id()
-            time.sleep(1)
-            flag = False
+            try:
+                book = Book.create(info[0], info[1], info[2].id)
+                print(f"\n-- '{book.title}' by {info[2].first_name} {info[2].last_name}, {book.pages} pages -- created!")
+                Book.update_id()
+                time.sleep(1)
+                flag = False
+            except Exception as e:
+                print(f'\n ** {e} **')
+                time.sleep(1)
+                flag = try_again()
     
 def update_book(book):
     print('\n\n <*- -=--  UPDATE A BOOK  --=- -*> \n')
-    info = collect_book_info()
-    book.title = info[0]
-    book.pages = info[1]
-    book.author_id = info[2].id
-    book.update()
-    print(f"\n-- '{book.title}', {info[2].first_name} {info[2].last_name}, {book.pages} pages -- updated!")
-    time.sleep(1)
+    flag = True
+    while flag:
+        info = collect_book_info()
+        try:
+            book.title = info[0]
+            book.pages = info[1]
+            book.author_id = info[2].id
+            book.update()
+            print(f"\n-- '{book.title}', {info[2].first_name} {info[2].last_name}, {book.pages} pages -- updated!")
+            time.sleep(1)
+            flag = False
+        except Exception as e:
+            print(f'\n ** {e} **')
+            time.sleep(1)
+            flag = try_again()
 
 def delete_book(book=None, author=None):
     flag = True
@@ -150,6 +168,18 @@ def delete_book(book=None, author=None):
             print("\n ** Invalid input **")
             time.sleep(1)
 
+def select_book():
+    list_books()
+    while True:
+        _id = input('\n\\\ SELECT book from list -=> ')
+        try:
+            _id = int(_id)
+            book = Book.find_by_id(_id)
+            return book
+        except:
+            print('\n ** Invalid input **')
+            time.sleep(1)
+
 def collect_book_info(author=None):
     flag = True
     while flag:
@@ -166,18 +196,6 @@ def collect_book_info(author=None):
         flag = verify_book_info(title, pages, author)
     return[title, pages, author]
 
-def select_book():
-    list_books()
-    while True:
-        _id = input('\n\\\ SELECT book from list -=> ')
-        try:
-            _id = int(_id)
-            book = Book.find_by_id(_id)
-            return book
-        except:
-            print('\n ** Invalid input **')
-            time.sleep(1)
-
 def verify_book_info(title, pages, author):
     while True:
         check_input = input(f'\n "{title}" by {author.first_name} {author.last_name}, {pages} pages -- ? Y / N >> ')
@@ -188,13 +206,6 @@ def verify_book_info(title, pages, author):
         else:
             print("\n ** Invalid input **")
             time.sleep(1)
-        
-def list_author_books(author=None):
-    if not author:
-        author = collect_author_name()
-    books = [book for book in author.books() if len(author.books()) > 0]
-    for book in books:
-        print(f"'{book.title}', {book.pages} pages")
 
 def exit_program():
     print("\n --  Goodbye!\n")

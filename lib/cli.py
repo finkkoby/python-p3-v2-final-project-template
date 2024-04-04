@@ -19,17 +19,14 @@ def main():
         main_menu()
 
 def main_menu():
-    while True:
-        answer = input('\nShow by (1) BOOK TITLE or by (2) AUTHOR? >> ')
-        if answer == '1':
-            book_menu()
-            break
-        elif answer == '2':
-            author_menu()
-            break
-        else:
-            print('\n ** Invalid input **')
-            time.sleep(1)
+    answer = input('\nShow by (1) BOOK TITLE or by (2) AUTHOR? >> ')
+    if answer == '1':
+        book_menu()
+    elif answer == '2':
+        author_menu()
+    else:
+        print('\n ** Invalid input **')
+        time.sleep(1)
 
 # --- BOOK HOME MENU ---
 def book_menu(display=True):
@@ -132,6 +129,7 @@ def author_show_more():
                 break
             elif answer.upper() == 'R':
                 delete_author()
+                author_menu()
                 break
             elif answer.upper() == 'S':
                 book_menu()

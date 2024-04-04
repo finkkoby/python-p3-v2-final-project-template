@@ -1,172 +1,114 @@
-# Phase 3 CLI+ORM Project Template
+# Welcome to my little library!
 
-## Learning Goals
-
-- Discuss the basic directory structure of a CLI.
-- Outline the first steps in building a CLI.
-
----
-
-## Introduction
-
-You now have a basic idea of what constitutes a CLI. Fork and clone this lesson
-for a project template for your CLI.
-
-Take a look at the directory structure:
-
-```console
-.
-├── Pipfile
-├── Pipfile.lock
-├── README.md
-└── lib
-    ├── models
-    │   ├── __init__.py
-    │   └── model_1.py
-    ├── cli.py
-    ├── debug.py
-    └── helpers.py
-```
-
-Note: The directory also includes two files named `CONTRIBUTING.md` and
-`LICENSE.md` that are specific to Flatiron's curriculum. You can disregard or
-delete the files if you want.
-
----
-
-## Generating Your Environment
-
-You might have noticed in the file structure- there's already a Pipfile!
-
-Install any additional dependencies you know you'll need for your project by
-adding them to the `Pipfile`. Then run the commands:
-
-```console
-pipenv install
-pipenv shell
-```
-
----
-
-## Generating Your CLI
-
-A CLI is, simply put, an interactive script and prompts the user and performs
-operations based on user input.
-
-The project template has a sample CLI in `lib/cli.py` that looks like this:
-
-```py
-# lib/cli.py
-
-from helpers import (
-    exit_program,
-    helper_1
-)
+This CLI program is meant to replicate a little library of your very own. In it,
+you are able to view books by title, or by author. You can check out a book (delete)
+or even add a new book to your little library. This CLI also gives you the ability to
+update any of the books or authors as well. Use this to keep track of your own reading
+or anybooks you wish to read. It is very easy to read and use, even if you don't have
+a ton of experience with command line or terminal!
 
 
-def main():
-    while True:
-        menu()
-        choice = input("> ")
-        if choice == "0":
-            exit_program()
-        elif choice == "1":
-            helper_1()
-        else:
-            print("Invalid choice")
+## lib/cli.py
+
+#### main()
+This function prints the header and loops the **main_menu** function to keep the user
+in the program.
+
+#### main_menu()
+This function provides the input field to allow the user to enter the library, either
+by BOOK TITLE or by AUTHOR. If they input '1', the **book_menu** function is called,
+and the **author_menu** function is called if they input '2' as their answer. Otherwise,
+invalid input will be printed to the screen, and **main_menu** will be called again in
+our **main** function.
+
+#### book_menu() and author_menu()
+These functions print a header to the screen to help break up the console output and make
+it easier to understand. It then prints a header message, assuming no argument is passed
+on the function call, and calls our next two functions. The optional argument is included
+so that this function can be resued without the header messages, in case where it may
+be redundant.
+
+#### bookshelf_display() and author_display()
+These functions are what prints our books or our authors to the screen. They also print the
+next set of menu options to move forward or back in the program.
+
+#### book_show_more() and author_show_more()
+These functions allow for input based on the items and menu options provided in 
+**bookshelf_display** and **author_display**. The display functions attach a number to each
+book/author, to allow the user to select one and see more. The input of this function will
+first check to see if the user input is an integer using the **check_for_int** functions. If
+the user input is an integer, the function will return the book or author the user requested,
+or it will return false if it is not an integer, or if the integer entered was invalid. Any
+other user input will either redirect the user to different function call, or it will print
+the invalid input message and loop back to allow for another input.
+
+#### check_for_int()
+There is a version of this function for a book and an author. The functions use try/except to
+try and turn the string input into an integer and then retrieve the corresponding book/author
+and return that object. If it is unable to do either of those things, it will return false.
+
+#### book_actions() and author_actions()
+These functions are called when a book or an author is selected by the user. These provide
+more options for the user to modify the book/author as well as go to a different 'page'.
+These also allow for input to select from the printed options.
 
 
-def menu():
-    print("Please select an option:")
-    print("0. Exit the program")
-    print("1. Some useful function")
+## lib/helpers.py
 
+#### list_books() and list_authors()
+These function use the respective class method **get_all** to get the list of items to display
+and prints each one to the screen.
 
-if __name__ == "__main__":
-    main()
-```
+#### find_book_by_id() and find_author_by_id()
+These allow the CLI access to the respective class method of the same name.
 
-The helper functions are located in `lib/helpers.py`:
+#### create_book() and create_author()
+These functions allow you to create a new book or author. They utilize the other helper functions
+to obtain the necessary user input to do so. Both functions check to see if the title or author
+name already exists, and if it does, it prints shows the invalid input message and asks the user if 
+they wish to try again (see below).
 
-```py
-# lib/helpers.py
+#### update_book() and update_author()
+These functions allow you to update an existing book or author. They utilize the other helper functions
+to obtain the necessary user input to do so, the same used for creating new items. They then call
+the instance method to update the database as well as the object in memory.
 
-def helper_1():
-    print("Performing useful function#1.")
+#### delete_book() and delete_author()
+These functions allow you to delete an existing book or author. In the case of books, since it is a 
+library style program, this action is referred to as 'checking out' a book. Both functions remove 
+the book and author from the database. In the case of authors, it will not let you delete an author
+if there are still books on the shelf by that author.
 
+#### select_book() and select_author()
+These helper functions display the list of books or authors and then allows the user to input which
+they would like to select. It then verifies that the input is a valid integer before fetching and 
+returning the selected item.
 
-def exit_program():
-    print("Goodbye!")
-    exit()
-```
+#### collect_book_info() and collect_author_name()
+These are used when updating or creating new items. Once these functions have the necessary valid 
+input from the user, it will use the verify functions to allow the user to confirm what they input.
 
-You can run the template CLI with `python lib/cli.py`, or include the shebang
-and make it executable with `chmod +x`. The template CLI will ask for input, do
-some work, and accomplish some sort of task.
+#### verify_book_info() and verify_author_name()
+As noted with the above functions, these functions allow the user to verify the information they
+put in before moving forward.
 
-Past that, CLIs can be whatever you'd like, as long as you follow the project
-requirements.
+#### author_book_display()
+This helper function displays a list of books by a given author. It also accounts for the case in
+which there are no books on the shelf by a given author.
 
-Of course, you will update `lib/cli.py` with prompts that are appropriate for
-your application, and you will update `lib/helpers.py` to replace `helper_1()`
-with a useful function based on the specific problem domain you decide to
-implement, along with adding other helper functions to the module.
+#### exit_program() and try_again()
+Exit program is not accessible by the user, but it is provided for developers. The **try_again**
+function is used in cases of invalid input by user, or if there is any kind of problem that 
+occurred during user action. It asks the user if they want to try again, and returns a boolean
+value indicating to the function that called it whether or not to break out of the loop.
 
-In the `lib/models` folder, you should rename `model_1.py` with the name of a
-data model class from your specific problem domain, and add other classes to the
-folder as needed. The file `lib/models/__init__.py` has been initialized to
-create the necessary database constants. You need to add import statements to
-the various data model classes in order to use the database constants.
+## Models
 
-You are also welcome to implement a different module and directory structure.
-However, your project should be well organized, modular, and follow the design
-principal of separation of concerns, which means you should separate code
-related to:
+I set up two standard classes, one for books and one for authors. They have your standard instance
+methods to create, modify, or remove items from the database as well the necessary class methods
+to handle the creation of the datatables and any requests made to the database.
 
-- User interface
-- Data persistence
-- Problem domain rules and logic
+## lib/debug.py
 
----
-
-## Updating README.md
-
-`README.md` is a Markdown file that should describe your project. You will
-replace the contents of this `README.md` file with a description of **your**
-actual project.
-
-Markdown is not a language that we cover in Flatiron's Software Engineering
-curriculum, but it's not a particularly difficult language to learn (if you've
-ever left a comment on Reddit, you might already know the basics). Refer to the
-cheat sheet in this assignments's resources for a basic guide to Markdown.
-
-### What Goes into a README?
-
-This README serves as a template. Replace the contents of this file to describe
-the important files in your project and describe what they do. Each Python file
-that you edit should get at least a paragraph, and each function should be
-described with a sentence or two.
-
-Describe your actual CLI script first, and with a good level of detail. The rest
-should be ordered by importance to the user. (Probably functions next, then
-models.)
-
-Screenshots and links to resources that you used throughout are also useful to
-users and collaborators, but a little more syntactically complicated. Only add
-these in if you're feeling comfortable with Markdown.
-
----
-
-## Conclusion
-
-A lot of work goes into a good CLI, but it all relies on concepts that you've
-practiced quite a bit by now. Hopefully this template and guide will get you off
-to a good start with your Phase 3 Project.
-
-Happy coding!
-
----
-
-## Resources
-
-- [Markdown Cheat Sheet](https://www.markdownguide.org/cheat-sheet/)
+I included this for testing purposes as well as resetting the database and passing in some default
+information to get started.
