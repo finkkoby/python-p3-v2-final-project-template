@@ -1,7 +1,0 @@
-Pass around objects not ids
-
-loop using flags instead of waiting to break out
-
-put choices into cli, not helpers
-
-take out options for invalid inputs

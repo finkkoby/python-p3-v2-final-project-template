@@ -136,8 +136,8 @@ class Author:
             FROM authors
             WHERE id = ?
         """
-        row = CURSOR.execute(sql, (author_id,)).fetchone()
-        return cls.instance_from_db(row) if row else Exception(f'Author {author_id} not found')
+        row = CURSOR.execute(sql, (str(author_id,))).fetchone()
+        return cls.instance_from_db(row) if row else None
 
     @classmethod
     def find_by_name(cls, first_name, last_name):
@@ -149,3 +149,16 @@ class Author:
         """
         row = CURSOR.execute(sql, (first_name, last_name)).fetchone()
         return cls.instance_from_db(row) if row else None
+    
+    @classmethod
+    def update_id(cls):
+        for i, book in enumerate(cls.get_all(), start=1):
+            if book.id != i:
+                book.id = i
+                sql = """
+                    UPDATE books
+                    SET id = ?
+                    WHERE title = ?
+                """
+                CURSOR.execute(sql, (i, book.title))
+                CONN.commit()

@@ -143,7 +143,7 @@ class Book:
             WHERE id = ?
         """
         row = CURSOR.execute(sql, (book_id,)).fetchone()
-        return cls.instance_from_db(row) if row else f"Book '{book_id}' not found"
+        return cls.instance_from_db(row) if row else None
 
     @classmethod
     def find_by_title(cls, title):
@@ -155,3 +155,22 @@ class Book:
         """
         row = CURSOR.execute(sql, (title,)).fetchone()
         return cls.instance_from_db(row) if row else None
+    
+    @classmethod
+    def update_id(cls):
+        sql = """
+            CREATE TABLE IF NOT EXISTS books_copy( 
+                id INTEGER PRIMARY KEY, 
+                title TEXT,
+                pages INTERGER,
+                author_id INTEGER,
+                FOREIGN KEY (author_id) REFERENCES authors(id)
+            );
+            INSERT INTO books_copy (title, pages, author_id)
+            SELECT title, pages, author_id FROM books ORDER BY title ASC;
+            DROP TABLE books;
+            ALTER TABLE books_copy RENAME TO books;
+        """
+        CURSOR.executescript(sql)
+        CONN.commit()
+                
