@@ -173,4 +173,5 @@ class Book:
         """
         CURSOR.executescript(sql)
         CONN.commit()
-                
+
+

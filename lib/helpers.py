@@ -4,6 +4,7 @@ from models.book import Book
 from models.__init__ import CONN, CURSOR
 import ipdb
 import time
+import re
 
 def list_authors():
     authors = Author.get_all()
@@ -82,8 +83,24 @@ def select_author():
 def collect_author_name():
     flag = True
     while flag:
-        first_name = input('\\\ Enter author FIRST name: ')
-        last_name = input('\\\ Enter author LAST name: ')
+        while True:
+            first_name = input('\\\ Enter author FIRST name: ')
+            pattern = re.compile(r'[A-z]*|[A-z]*\s[A-z]*')
+            match = pattern.fullmatch(first_name)
+            if match:
+                break
+            else:
+                print("\n ** Author name must be letters only **")
+                time.sleep(1)
+        while True:
+            last_name = input('\\\ Enter author LAST name: ')
+            pattern = re.compile(r'[A-z]*|[A-z]*\s[A-z]*')
+            match = pattern.fullmatch(last_name)
+            if match:
+               break
+            else:
+                print("\n ** Author name must be letters only **")
+                time.sleep(1)
         flag = verify_author_name(first_name, last_name)
     return [first_name, last_name]
 
